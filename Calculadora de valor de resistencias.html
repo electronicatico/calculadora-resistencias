@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Resistencias de 5 Bandas | TicoElectronica.com</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .calculator {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+
+        .band-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .band {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0.5rem;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .band-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: var(--border-radius);
+            background-color: white;
+            color: var(--dark);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .resistor-display {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .resistor-body {
+            width: 300px;
+            height: 80px;
+            background: linear-gradient(to right, #e9ecef, #dee2e6, #e9ecef);
+            border-radius: 40px;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .resistor-band {
+            width: 20px;
+            height: 60px;
+            border-radius: 4px;
+            margin: 0 2px;
+        }
+
+        .resistor-lead {
+            width: 50px;
+            height: 6px;
+            background-color: #adb5bd;
+        }
+
+        .result-container {
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .result-tolerance {
+            font-size: 1.2rem;
+            color: #495057;
+        }
+
+        .color-code {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .color-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: var(--box-shadow);
+        }
+
+        .btn-reset {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn-reset:hover {
+            background-color: #5a6268;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .band-selector {
+                flex-direction: column;
+            }
+            
+            .band {
+                margin-bottom: 1rem;
+            }
+            
+            .resistor-body {
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator">
+            <h1>Calculadora de Resistencias de 5 Bandas</h1>
+            <p class="subtitle">Selecciona los colores de cada banda para calcular el valor de la resistencia</p>
+            
+            <div class="band-selector">
+                <div class="band">
+                    <span class="band-label">1ª Banda</span>
+                    <select id="band1">
+                        <option value="0">Negro</option>
+                        <option value="1">Marrón</option>
+                        <option value="2">Rojo</option>
+                        <option value="3">Naranja</option>
+                        <option value="4">Amarillo</option>
+                        <option value="5">Verde</option>
+                        <option value="6">Azul</option>
+                        <option value="7">Violeta</option>
+                        <option value="8">Gris</option>
+                        <option value="9">Blanco</option>
+                    </select>
+                </div>
+                
+                <div class="band">
+                    <span class="band-label">2ª Banda</span>
+                    <select id="band2">
+                        <option value="0">Negro</option>
+                        <option value="1">Marrón</option>
+                        <option value="2">Rojo</option>
+                        <option value="3">Naranja</option>
+                        <option value="4">Amarillo</option>
+                        <option value="5">Verde</option>
+                        <option value="6">Azul</option>
+                        <option value="7">Violeta</option>
+                        <option value="8">Gris</option>
+                        <option value="9">Blanco</option>
+                    </select>
+                </div>
+                
+                <div class="band">
+                    <span class="band-label">3ª Banda</span>
+                    <select id="band3">
+                        <option value="0">Negro</option>
+                        <option value="1">Marrón</option>
+                        <option value="2">Rojo</option>
+                        <option value="3">Naranja</option>
+                        <option value="4">Amarillo</option>
+                        <option value="5">Verde</option>
+                        <option value="6">Azul</option>
+                        <option value="7">Violeta</option>
+                        <option value="8">Gris</option>
+                        <option value="9">Blanco</option>
+                    </select>
+                </div>
+                
+                <div class="band">
+                    <span class="band-label">Multiplicador</span>
+                    <select id="multiplier">
+                        <option value="1">Negro (x1Ω)</option>
+                        <option value="10">Marrón (x10Ω)</option>
+                        <option value="100">Rojo (x100Ω)</option>
+                        <option value="1000">Naranja (x1kΩ)</option>
+                        <option value="10000">Amarillo (x10kΩ)</option>
+                        <option value="100000">Verde (x100kΩ)</option>
+                        <option value="1000000">Azul (x1MΩ)</option>
+                        <option value="10000000">Violeta (x10MΩ)</option>
+                        <option value="0.01">Dorado (x0.01Ω)</option>
+                        <option value="0.1">Plateado (x0.1Ω)</option>
+                    </select>
+                </div>
+                
+                <div class="band">
+                    <span class="band-label">Tolerancia</span>
+                    <select id="tolerance">
+                        <option value="1">Marrón (±1%)</option>
+                        <option value="2">Rojo (±2%)</option>
+                        <option value="0.5">Verde (±0.5%)</option>
+                        <option value="0.25">Azul (±0.25%)</option>
+                        <option value="0.1">Violeta (±0.1%)</option>
+                        <option value="0.05">Gris (±0.05%)</option>
+                        <option value="5">Dorado (±5%)</option>
+                        <option value="10">Plateado (±10%)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="resistor-display">
+                <div class="resistor-lead"></div>
+                <div class="resistor-body" id="resistor">
+                    <div class="resistor-band" id="band1-display"></div>
+                    <div class="resistor-band" id="band2-display"></div>
+                    <div class="resistor-band" id="band3-display"></div>
+                    <div class="resistor-band" id="multiplier-display"></div>
+                    <div class="resistor-band" id="tolerance-display"></div>
+                </div>
+                <div class="resistor-lead"></div>
+            </div>
+            
+            <div class="result-container">
+                <h3>Valor de la Resistencia:</h3>
+                <div class="result-value" id="resistance-value">0 Ω</div>
+                <div class="result-tolerance" id="tolerance-value">±1%</div>
+            </div>
+            
+            <div class="color-code">
+                <div class="color-box" style="background-color: black;">0</div>
+                <div class="color-box" style="background-color: #964B00;">1</div>
+                <div class="color-box" style="background-color: red;">2</div>
+                <div class="color-box" style="background-color: orange;">3</div>
+                <div class="color-box" style="background-color: yellow; color: black;">4</div>
+                <div class="color-box" style="background-color: green;">5</div>
+                <div class="color-box" style="background-color: blue;">6</div>
+                <div class="color-box" style="background-color: violet;">7</div>
+                <div class="color-box" style="background-color: gray;">8</div>
+                <div class="color-box" style="background-color: white; color: black;">9</div>
+                <div class="color-box" style="background-color: gold; color: black;">±5%</div>
+                <div class="color-box" style="background-color: silver; color: black;">±10%</div>
+            </div>
+            
+            <button class="btn-reset" id="reset-btn">Reiniciar</button>
+        </div>
+        
+        <footer>
+            <p>© 2023 <a href="https://www.ticoelectronica.com" target="_blank">TicoElectronica.com</a> - Todos los derechos reservados</p>
+        </footer>
+    </div>
+
+    <script>
+        // Mapeo de colores
+        const colorMap = {
+            '0': { name: 'Negro', color: 'black', text: 'white' },
+            '1': { name: 'Marrón', color: '#964B00', text: 'white' },
+            '2': { name: 'Rojo', color: 'red', text: 'white' },
+            '3': { name: 'Naranja', color: 'orange', text: 'black' },
+            '4': { name: 'Amarillo', color: 'yellow', text: 'black' },
+            '5': { name: 'Verde', color: 'green', text: 'white' },
+            '6': { name: 'Azul', color: 'blue', text: 'white' },
+            '7': { name: 'Violeta', color: 'violet', text: 'white' },
+            '8': { name: 'Gris', color: 'gray', text: 'black' },
+            '9': { name: 'Blanco', color: 'white', text: 'black' },
+            '0.01': { name: 'Dorado', color: 'gold', text: 'black' },
+            '0.1': { name: 'Plateado', color: 'silver', text: 'black' },
+            '1': { name: 'Negro', color: 'black', text: 'white' },
+            '10': { name: 'Marrón', color: '#964B00', text: 'white' },
+            '100': { name: 'Rojo', color: 'red', text: 'white' },
+            '1000': { name: 'Naranja', color: 'orange', text: 'black' },
+            '10000': { name: 'Amarillo', color: 'yellow', text: 'black' },
+            '100000': { name: 'Verde', color: 'green', text: 'white' },
+            '1000000': { name: 'Azul', color: 'blue', text: 'white' },
+            '10000000': { name: 'Violeta', color: 'violet', text: 'white' },
+            '0.5': { name: 'Verde', color: 'green', text: 'white' },
+            '0.25': { name: 'Azul', color: 'blue', text: 'white' },
+            '0.1': { name: 'Violeta', color: 'violet', text: 'white' },
+            '0.05': { name: 'Gris', color: 'gray', text: 'black' },
+            '5': { name: 'Dorado', color: 'gold', text: 'black' },
+            '10': { name: 'Plateado', color: 'silver', text: 'black' }
+        };
+
+        // Elementos del DOM
+        const band1Select = document.getElementById('band1');
+        const band2Select = document.getElementById('band2');
+        const band3Select = document.getElementById('band3');
+        const multiplierSelect = document.getElementById('multiplier');
+        const toleranceSelect = document.getElementById('tolerance');
+        const resistanceValue = document.getElementById('resistance-value');
+        const toleranceValue = document.getElementById('tolerance-value');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Elementos de visualización de bandas
+        const band1Display = document.getElementById('band1-display');
+        const band2Display = document.getElementById('band2-display');
+        const band3Display = document.getElementById('band3-display');
+        const multiplierDisplay = document.getElementById('multiplier-display');
+        const toleranceDisplay = document.getElementById('tolerance-display');
+
+        // Función para actualizar la resistencia
+        function updateResistor() {
+            const band1Value = band1Select.value;
+            const band2Value = band2Select.value;
+            const band3Value = band3Select.value;
+            const multiplierValue = multiplierSelect.value;
+            const toleranceValue = toleranceSelect.value;
+
+            // Actualizar colores de las bandas
+            updateBandDisplay(band1Display, band1Value);
+            updateBandDisplay(band2Display, band2Value);
+            updateBandDisplay(band3Display, band3Value);
+            updateBandDisplay(multiplierDisplay, multiplierValue);
+            updateBandDisplay(toleranceDisplay, toleranceValue);
+
+            // Calcular valor de la resistencia
+            const significantDigits = parseInt(band1Value + band2Value + band3Value);
+            const multiplier = parseFloat(multiplierValue);
+            const resistance = significantDigits * multiplier;
+            const tolerance = parseFloat(toleranceValue);
+
+            // Formatear el valor de la resistencia
+            let formattedResistance;
+            if (resistance >= 1000000) {
+                formattedResistance = (resistance / 1000000).toFixed(2) + ' MΩ';
+            } else if (resistance >= 1000) {
+                formattedResistance = (resistance / 1000).toFixed(2) + ' kΩ';
+            } else {
+                formattedResistance = resistance.toFixed(2) + ' Ω';
+            }
+
+            // Actualizar resultados
+            document.getElementById('resistance-value').textContent = formattedResistance;
+            document.getElementById('tolerance-value').textContent = `±${tolerance}%`;
+        }
+
+        // Función para actualizar la visualización de una banda
+        function updateBandDisplay(element, value) {
+            const colorInfo = colorMap[value];
+            if (colorInfo) {
+                element.style.backgroundColor = colorInfo.color;
+                element.style.color = colorInfo.text;
+                element.title = colorInfo.name;
+            }
+        }
+
+        // Función para reiniciar la calculadora
+        function resetCalculator() {
+            band1Select.selectedIndex = 0;
+            band2Select.selectedIndex = 0;
+            band3Select.selectedIndex = 0;
+            multiplierSelect.selectedIndex = 0;
+            toleranceSelect.selectedIndex = 0;
+            updateResistor();
+        }
+
+        // Event listeners
+        band1Select.addEventListener('change', updateResistor);
+        band2Select.addEventListener('change', updateResistor);
+        band3Select.addEventListener('change', updateResistor);
+        multiplierSelect.addEventListener('change', updateResistor);
+        toleranceSelect.addEventListener('change', updateResistor);
+        resetBtn.addEventListener('click', resetCalculator);
+
+        // Inicializar
+        updateResistor();
+    </script>
+</body>
+</html>
